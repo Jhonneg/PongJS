@@ -1,7 +1,10 @@
-import { emit } from "process";
+import sockets from "./socket.js";
+import apiServer from "./api.js";
+import { createServer } from "http";
+import { Server } from "socket.io";
 
-const server = require("http").createServer();
-const io = require("socket.io")(server, {
+const httpServer = createServer(apiServer);
+const io = new Server(httpServer, {
   cors: {
     origin: "*",
     methods: ["GET", "POST"],
@@ -9,27 +12,6 @@ const io = require("socket.io")(server, {
 });
 
 const PORT = 3000;
-server.listen(PORT);
+httpServer.listen(PORT);
 console.log(`Listening on port ${PORT}...`);
-
-let readyPlayerCount = 0;
-
-io.on("connection", (socket) => {
-  console.log("A user has connected as...", socket.id);
-  socket.on("ready", () => {
-    console.log("Player ready", socket.id);
-    readyPlayerCount++;
-    if (readyPlayerCount % 2 === 0) {
-      io.emit("startGame", socket.id);
-    }
-  });
-  socket.on("paddleMove", (paddleData) => {
-    socket.broadcast.emit("paddleMove", paddleData);
-  });
-  socket.on("ballMove", (ballData) => {
-    socket.broadcast.emit("ballMove", ballData);
-  });
-  socket.on("disconnect", (reason) => {
-    console.log(`Client ${socket.id} disconnected: ${reason}`);
-  });
-});
+sockets(io);
