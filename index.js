@@ -196,7 +196,7 @@ function startGame() {
   isNewGame = false;
   playerScore = 0;
   renderIntro();
-  socket.emit("ready", {});
+  socket.emit("ready");
   ballReset();
   createCanvas();
   animate();
@@ -218,4 +218,8 @@ startGame();
 
 socket.on("connect", () => {
   console.log("Connected as..", socket.id);
+});
+
+socket.on("startGame", (refereeId) => {
+  console.log("Referee is", refereeId);
 });
