@@ -1,7 +1,7 @@
 const server = require("http").createServer();
 const io = require("socket.io")(server, {
   cors: {
-    origin: "http://localhost:3000",
+    origin: "*",
     methods: ["GET", "POST"],
   },
 });
@@ -20,5 +20,8 @@ io.on("connection", (socket) => {
     if (readyPlayerCount === 2) {
       io.emit("startGame", socket.id);
     }
+  });
+  socket.on("paddleMove", (paddleData) => {
+    socket.broadcast.emit("paddleMove", paddleData);
   });
 });

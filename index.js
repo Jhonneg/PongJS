@@ -38,7 +38,31 @@ if (isMobile.matches) {
   speedX = speedY;
 }
 
+// Create Canvas Element
+function createCanvas() {
+  canvas.id = "canvas";
+  canvas.width = width;
+  canvas.height = height;
+  body.appendChild(canvas);
+  renderCanvas();
+}
+
+function renderIntro() {
+  // Canvas Background
+  context.fillStyle = "black";
+  context.fillRect(0, 0, width, height);
+
+  // Intro Text
+  context.fillStyle = "white";
+  context.font = "32px Courier New";
+  context.fillText("Waiting for opponent...", 20, canvas.height / 2 - 30);
+}
 function renderCanvas() {
+  // Canvas Background
+  context.fillStyle = "black";
+  context.fillRect(0, 0, width, height);
+  // Paddle Color
+  context.fillStyle = "white";
   // Bottom Paddle
   context.fillRect(paddleX[0], height - 20, paddleWidth, paddleHeight);
 
@@ -63,26 +87,6 @@ function renderCanvas() {
   context.font = "32px Courier New";
   context.fillText(score[0], 20, canvas.height / 2 + 50);
   context.fillText(score[1], 20, canvas.height / 2 - 30);
-}
-
-// Create Canvas Element
-function createCanvas() {
-  canvas.id = "canvas";
-  canvas.width = width;
-  canvas.height = height;
-  body.appendChild(canvas);
-  renderCanvas();
-}
-
-function renderIntro() {
-  // Canvas Background
-  context.fillStyle = "black";
-  context.fillRect(0, 0, width, height);
-
-  // Intro Text
-  context.fillStyle = "white";
-  context.font = "32px Courier New";
-  context.fillText("Waiting for opponent...", 20, canvas.height / 2 - 30);
 }
 
 // Reset Ball to Center
@@ -153,35 +157,10 @@ function ballBoundaries() {
   }
 }
 
-function showGameOverEl(winner) {
-  //  Hide Canvas
-  canvas.hidden = true;
-  // Container
-  gameOverEl.textContent = "";
-  gameOverEl.classList.add("game-over-container");
-  // Title
-  const title = document.createElement("h1");
-  title.textContent = `${winner} Wins!`;
-  // Button
-  const playAgainBtn = document.createElement("button");
-  playAgainBtn.setAttribute("onclick", "startGame()");
-  playAgainBtn.textContent = "Play Again";
-  // Append
-  gameOverEl.append(title, playAgainBtn);
-  body.appendChild(gameOverEl);
-}
-
-function gameOver() {
-  if (score[0] === winningScore) {
-    let winner = score[0] === winningScore ? "Player One" : "Player Two";
-    showGameOverEl(winner);
-  }
-}
-
 // Called Every Frame
 function animate() {
-  renderCanvas();
   ballMove();
+  renderCanvas();
   ballBoundaries();
   window.requestAnimationFrame(animate);
 }
@@ -203,6 +182,9 @@ function startGame() {
     if (paddleX[paddleIndex] > width - paddleWidth) {
       paddleX[paddleIndex] = width - paddleWidth;
     }
+    socket.emit("paddleMove", {
+      xPosition: paddleX[paddleIndex],
+    });
     canvas.style.cursor = "none";
   });
 }
@@ -218,4 +200,9 @@ socket.on("startGame", (refereeId) => {
   console.log("Referee is", refereeId);
   isReferee = socket.id === refereeId;
   startGame();
+});
+
+socket.on("paddleMove", (paddleData) => {
+  const opponentPaddleIndex = 1 - paddleIndex;
+  paddleX[opponentPaddleIndex] = paddleData.xPosition;
 });
