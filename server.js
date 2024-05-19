@@ -1,7 +1,7 @@
 const server = require("http").createServer();
 const io = require("socket.io")(server, {
   cors: {
-    origin: "http://127.0.0.1:5500",
+    origin: "http://localhost:3000",
     methods: ["GET", "POST"],
   },
 });
@@ -18,7 +18,7 @@ io.on("connection", (socket) => {
     console.log("Player ready", socket.id);
     readyPlayerCount++;
     if (readyPlayerCount === 2) {
-      io.emit('startGame', socket.id)
+      io.emit("startGame", socket.id);
     }
   });
 });
