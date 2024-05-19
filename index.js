@@ -1,6 +1,7 @@
 const { body } = document;
 const canvas = document.createElement("canvas");
 const context = canvas.getContext("2d");
+const socket = io("http://localhost:3000");
 const width = 500;
 const height = 700;
 const screenWidth = window.screen.width;
@@ -23,20 +24,16 @@ const ballRadius = 5;
 let speedY;
 let speedX;
 let trajectoryX;
-let computerSpeed;
 
 if (isMobile.matches) {
   speedY = -2;
   speedX = speedY;
-  computerSpeed = 4;
 } else {
   speedY = -1;
   speedX = speedY;
-  computerSpeed = 3;
 }
 
 let playerScore = 0;
-let computerScore = 0;
 const winningScore = 5;
 let isGameOver = true;
 let isNewGame = true;
@@ -65,7 +62,6 @@ function renderCanvas() {
   // Score
   context.font = "32px Courier New";
   context.fillText(playerScore, 20, canvas.height / 2 + 50);
-  context.fillText(computerScore, 20, canvas.height / 2 - 30);
 }
 
 // Create Canvas Element
@@ -76,6 +72,16 @@ function createCanvas() {
   renderCanvas();
 }
 
+function renderIntro() {
+  // Canvas Background
+  context.fillStyle = "black";
+  context.fillRect(0, 0, width, height);
+
+  // Intro Text
+  context.fillStyle = "white";
+  context.font = "32px Courier New";
+  context.fillText("Waiting for opponent...", 20, canvas.height / 2 - 30);
+}
 // Reset Ball to Center
 function ballReset() {
   ballX = width / 2;
@@ -114,16 +120,13 @@ function ballBoundaries() {
         // Max Speed
         if (speedY < -5) {
           speedY = -5;
-          computerSpeed = 6;
         }
       }
       speedY = -speedY;
       trajectoryX = ballX - (paddleBottomX + paddleDiff);
       speedX = trajectoryX * 0.3;
     } else if (ballY > height) {
-      // Reset Ball, add to Computer Score
       ballReset();
-      computerScore++;
     }
   }
   // Bounce off computer paddle (top)
@@ -146,17 +149,6 @@ function ballBoundaries() {
   }
 }
 
-// Computer Movement
-function computerAI() {
-  if (playerMoved) {
-    if (paddleTopX + paddleDiff < ballX) {
-      paddleTopX += computerSpeed;
-    } else {
-      paddleTopX -= computerSpeed;
-    }
-  }
-}
-
 function showGameOverEl(winner) {
   //  Hide Canvas
   canvas.hidden = true;
@@ -175,12 +167,10 @@ function showGameOverEl(winner) {
   body.appendChild(gameOverEl);
 }
 
-// Check If One Player Has Winning Score, If They Do, End Game
 function gameOver() {
-  if (playerScore === winningScore || computerScore === winningScore) {
+  if (playerScore === winningScore) {
     isGameOver = true;
-    // Set Winner
-    let winner = playerScore === winningScore ? "Player" : "Computer";
+    let winner = playerScore === winningScore ? "Player One" : "Player Two";
     showGameOverEl(winner);
   }
 }
@@ -190,7 +180,6 @@ function animate() {
   renderCanvas();
   ballMove();
   ballBoundaries();
-  computerAI();
   gameOver();
   if (!isGameOver) {
     window.requestAnimationFrame(animate);
@@ -206,12 +195,12 @@ function startGame() {
   isGameOver = false;
   isNewGame = false;
   playerScore = 0;
-  computerScore = 0;
+  renderIntro();
+  socket.emit("ready", {});
   ballReset();
   createCanvas();
   animate();
   canvas.addEventListener("mousemove", (e) => {
-    console.log(e.clientX);
     playerMoved = true;
     paddleBottomX = e.clientX - canvas.offsetLeft;
     if (paddleBottomX < paddleDiff) {
@@ -226,3 +215,7 @@ function startGame() {
 
 // On Load
 startGame();
+
+socket.on("connect", () => {
+  console.log("Connected as..", socket.id);
+});
