@@ -1,22 +1,27 @@
+let readyPlayerCount = 0;
 export default function listen(io) {
-  let readyPlayerCount = 0;
-  io.on("connection", (socket) => {
-    console.log("A user has connected as...", socket.id);
+  const pongNamespace = io.of("/pong");
+  pongNamespace.on("connection", (socket) => {
+    console.log("A user has connected", socket.id);
+    let room;
     socket.on("ready", () => {
-      console.log("Player ready", socket.id);
+      room = `room ${Math.floor(readyPlayerCount / 2)}`;
+      socket.join(room);
+      console.log("Player ready", socket.id, room);
       readyPlayerCount++;
       if (readyPlayerCount % 2 === 0) {
-        io.emit("startGame", socket.id);
+        pongNamespace.in(room).emit("startGame", socket.id);
       }
     });
     socket.on("paddleMove", (paddleData) => {
-      socket.broadcast.emit("paddleMove", paddleData);
+      socket.to(room).emit("paddleMove", paddleData);
     });
     socket.on("ballMove", (ballData) => {
-      socket.broadcast.emit("ballMove", ballData);
+      socket.to(room).emit("ballMove", ballData);
     });
     socket.on("disconnect", (reason) => {
       console.log(`Client ${socket.id} disconnected: ${reason}`);
+      socket.leave(room);
     });
   });
 }

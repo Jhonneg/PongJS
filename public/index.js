@@ -1,7 +1,7 @@
 const { body } = document;
 const canvas = document.createElement("canvas");
 const context = canvas.getContext("2d");
-const socket = io();
+const socket = io("/pong");
 let isReferee = false;
 let paddleIndex = 0;
 
@@ -93,7 +93,7 @@ function renderCanvas() {
 function ballReset() {
   ballX = width / 2;
   ballY = height / 2;
-  speedY = -3;
+  speedY = 3;
   socket.emit("ballMove", {
     ballX,
     ballY,
@@ -104,7 +104,7 @@ function ballReset() {
 // Adjust Ball Movement
 function ballMove() {
   // Vertical Speed
-  ballY += -speedY * ballDirection;
+  ballY += speedY * ballDirection;
   // Horizontal Speed
   if (playerMoved) {
     ballX += speedX;
@@ -131,10 +131,10 @@ function ballBoundaries() {
     if (ballX > paddleX[0] && ballX < paddleX[0] + paddleWidth) {
       // Add Speed on Hit
       if (playerMoved) {
-        speedY -= 1;
+        speedY += 1;
         // Max Speed
         if (speedY < -5) {
-          speedY = -5;
+          speedY = +5;
         }
       }
       ballDirection = -ballDirection;
