@@ -210,27 +210,32 @@ function startGame() {
   ballReset();
   createCanvas();
   animate();
-  // document.addEventListener("keydown", keyDownHandler, false);
-  // document.addEventListener("keyup", keyUpHandler, false);
-  // function keyDownHandler(e) {
-  //   if (e.key === "Right" || e.key === "ArrowRight") {
-  //     rightPressed = true;
-  //   } else if (e.key === "Left" || e.key === "ArrowLeft") {
-  //     leftPressed = true;
-  //   }
-  // }
-  // function keyUpHandler(e) {
-  //   if (e.key === "Right" || e.key === "ArrowRight") {
-  //     rightPressed = false;
-  //   } else if (e.key === "Left" || e.key === "ArrowLeft") {
-  //     leftPressed = false;
-  //   }
+  document.addEventListener("keydown", keyDownHandler, false);
+  document.addEventListener("keyup", keyUpHandler, false);
+  function keyDownHandler(e) {
+    if (e.key === "Right" || e.key === "ArrowRight") {
+      rightPressed = true;
+    } else if (e.key === "Left" || e.key === "ArrowLeft") {
+      leftPressed = true;
+    }
+  }
+  function keyUpHandler(e) {
+    if (e.key === "Right" || e.key === "ArrowRight") {
+      rightPressed = false;
+    } else if (e.key === "Left" || e.key === "ArrowLeft") {
+      leftPressed = false;
+    }
+  }
+  // if (rightPressed && paddleBottomX < canvas.width - paddleWidth) {
+  //   paddleBottomX += 7;
+  // } else if (leftPressed && paddleBottomX > 0) {
+  //   paddleBottomX -= 7;
   // }
   canvas.addEventListener("mousemove", (e) => {
     console.log(e.clientX);
     playerMoved = true;
     // Compensate for canvas being centered
-    paddleBottomX = e.clientX + 230 - canvasPosition - paddleDiff;
+    paddleBottomX = e.clientX - canvas.offsetLeft;
     if (paddleBottomX < paddleDiff) {
       paddleBottomX = 0;
     }
