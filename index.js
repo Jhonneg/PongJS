@@ -62,15 +62,15 @@ function renderCanvas() {
   context.setLineDash([4]);
   context.moveTo(0, 350);
   context.lineTo(500, 350);
-  context.strokeStyle = 'grey';
+  context.strokeStyle = "grey";
   context.stroke();
   // Ball
   context.beginPath();
   context.arc(ballX, ballY, ballRadius, 2 * Math.PI, false);
-  context.fillStyle = 'white';
+  context.fillStyle = "white";
   context.fill();
   // Score
-  context.font = '32px Courier New';
+  context.font = "32px Courier New";
   context.fillText(playerScore, 20, canvas.height / 2 + 50);
   context.fillText(computerScore, 20, canvas.height / 2 - 30);
 }
@@ -82,9 +82,6 @@ function createCanvas() {
   body.appendChild(canvas);
   renderCanvas();
 }
-
-// Remove this
-createCanvas();
 
 // Reset Ball to Center
 function ballReset() {
@@ -198,6 +195,7 @@ function animate() {
   ballMove();
   ballBoundaries();
   computerAI();
+  window.requestAnimationFrame(animate);
 }
 
 // Start Game, Reset Everything
@@ -212,21 +210,36 @@ function startGame() {
   ballReset();
   createCanvas();
   animate();
+  // document.addEventListener("keydown", keyDownHandler, false);
+  // document.addEventListener("keyup", keyUpHandler, false);
+  // function keyDownHandler(e) {
+  //   if (e.key === "Right" || e.key === "ArrowRight") {
+  //     rightPressed = true;
+  //   } else if (e.key === "Left" || e.key === "ArrowLeft") {
+  //     leftPressed = true;
+  //   }
+  // }
+  // function keyUpHandler(e) {
+  //   if (e.key === "Right" || e.key === "ArrowRight") {
+  //     rightPressed = false;
+  //   } else if (e.key === "Left" || e.key === "ArrowLeft") {
+  //     leftPressed = false;
+  //   }
+  // }
   canvas.addEventListener("mousemove", (e) => {
     console.log(e.clientX);
     playerMoved = true;
     // Compensate for canvas being centered
-    paddleBottomX = e.clientX - canvasPosition - paddleDiff;
+    paddleBottomX = e.clientX + 230 - canvasPosition - paddleDiff;
     if (paddleBottomX < paddleDiff) {
       paddleBottomX = 0;
     }
     if (paddleBottomX > width - paddleWidth) {
       paddleBottomX = width - paddleWidth;
     }
-    // Hide Cursor
     canvas.style.cursor = "none";
   });
 }
 
 // On Load
-// startGame();
+startGame();
