@@ -7,7 +7,7 @@ body {
 }
 
 canvas {
-  margin-top: 25px;
+  margin-top: 0px;
   z-index: 10;
 }
 
@@ -52,8 +52,7 @@ button:focus {
   outline: none;
 }
 
-
-@media screen and (min-width: 1800px) {
+@media screen and (min-width: 2560px) {
   canvas {
     margin-top: 100px;
   }
@@ -62,7 +61,6 @@ button:focus {
     margin-top: -19px;
   }
 }
-
 
 @media screen and (max-width: 500px) {
   canvas {

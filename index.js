@@ -1,4 +1,3 @@
-// Canvas
 const { body } = document;
 const canvas = document.createElement("canvas");
 const context = canvas.getContext("2d");
@@ -9,7 +8,6 @@ const canvasPosition = screenWidth / 2 - width / 2;
 const isMobile = window.matchMedia("(max-width: 600px)");
 const gameOverEl = document.createElement("div");
 
-// Paddle
 const paddleHeight = 10;
 const paddleWidth = 50;
 const paddleDiff = 25;
@@ -18,18 +16,15 @@ let paddleTopX = 225;
 let playerMoved = false;
 let paddleContact = false;
 
-// Ball
 let ballX = 250;
 let ballY = 350;
 const ballRadius = 5;
 
-// Speed
 let speedY;
 let speedX;
 let trajectoryX;
 let computerSpeed;
 
-// Change Mobile Settings
 if (isMobile.matches) {
   speedY = -2;
   speedX = speedY;
@@ -40,14 +35,12 @@ if (isMobile.matches) {
   computerSpeed = 3;
 }
 
-// Score
 let playerScore = 0;
 let computerScore = 0;
-const winningScore = 7;
-// let isGameOver = true;
-// let isNewGame = true;
+const winningScore = 5;
+let isGameOver = true;
+let isNewGame = true;
 
-// Render Everything on Canvas
 function renderCanvas() {
   context.fillStyle = "black";
   context.fillRect(0, 0, width, height);
@@ -165,28 +158,31 @@ function computerAI() {
 }
 
 function showGameOverEl(winner) {
-  // Hide Canvas
-  // // Container
-  // gameOverEl.textContent = '';
-  // gameOverEl.classList.add('game-over-container');
-  // // Title
-  // const title = document.createElement('h1');
-  // title.textContent = `${winner} Wins!`;
-  // // Button
-  // const playAgainBtn = document.createElement('button');
-  // playAgainBtn.setAttribute('onclick', 'startGame()');
-  // playAgainBtn.textContent = 'Play Again';
-  // // Append
+  //  Hide Canvas
+  canvas.hidden = true;
+  // Container
+  gameOverEl.textContent = "";
+  gameOverEl.classList.add("game-over-container");
+  // Title
+  const title = document.createElement("h1");
+  title.textContent = `${winner} Wins!`;
+  // Button
+  const playAgainBtn = document.createElement("button");
+  playAgainBtn.setAttribute("onclick", "startGame()");
+  playAgainBtn.textContent = "Play Again";
+  // Append
+  gameOverEl.append(title, playAgainBtn);
+  body.appendChild(gameOverEl);
 }
 
 // Check If One Player Has Winning Score, If They Do, End Game
 function gameOver() {
-  // if (playerScore === winningScore || computerScore === winningScore) {
-  //   isGameOver = ;
-  //   // Set Winner
-  //   let winner = ;
-  //   showGameOverEl(winner);
-  // }
+  if (playerScore === winningScore || computerScore === winningScore) {
+    isGameOver = true;
+    // Set Winner
+    let winner = playerScore === winningScore ? "Player" : "Computer";
+    showGameOverEl(winner);
+  }
 }
 
 // Called Every Frame
@@ -195,46 +191,28 @@ function animate() {
   ballMove();
   ballBoundaries();
   computerAI();
-  window.requestAnimationFrame(animate);
+  gameOver();
+  if (!isGameOver) {
+    window.requestAnimationFrame(animate);
+  }
 }
 
 // Start Game, Reset Everything
 function startGame() {
-  // if (isGameOver && !isNewGame) {
-
-  // }
-  // isGameOver = ;
-  // isNewGame = ;
+  if (isGameOver && !isNewGame) {
+    body.removeChild(gameOverEl);
+    canvas.hidden = false;
+  }
+  isGameOver = false;
+  isNewGame = false;
   playerScore = 0;
   computerScore = 0;
   ballReset();
   createCanvas();
   animate();
-  document.addEventListener("keydown", keyDownHandler, false);
-  document.addEventListener("keyup", keyUpHandler, false);
-  function keyDownHandler(e) {
-    if (e.key === "Right" || e.key === "ArrowRight") {
-      rightPressed = true;
-    } else if (e.key === "Left" || e.key === "ArrowLeft") {
-      leftPressed = true;
-    }
-  }
-  function keyUpHandler(e) {
-    if (e.key === "Right" || e.key === "ArrowRight") {
-      rightPressed = false;
-    } else if (e.key === "Left" || e.key === "ArrowLeft") {
-      leftPressed = false;
-    }
-  }
-  // if (rightPressed && paddleBottomX < canvas.width - paddleWidth) {
-  //   paddleBottomX += 7;
-  // } else if (leftPressed && paddleBottomX > 0) {
-  //   paddleBottomX -= 7;
-  // }
   canvas.addEventListener("mousemove", (e) => {
     console.log(e.clientX);
     playerMoved = true;
-    // Compensate for canvas being centered
     paddleBottomX = e.clientX - canvas.offsetLeft;
     if (paddleBottomX < paddleDiff) {
       paddleBottomX = 0;
