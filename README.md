@@ -1,6 +1,6 @@
 # multiplayerPong
 
-[![Current tech stack](https://skillicons.dev/icons?i=nodejs,express,socket.io)](https://skillicons.dev)
+[![Current tech stack](https://skillicons.dev/icons?i=nodejs,express)](https://skillicons.dev)
 
 A Multiplayer pong game built with Node.js/Express and Socket.io.
 
