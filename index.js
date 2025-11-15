@@ -11,7 +11,7 @@ const io = new Server(httpServer, {
   },
 });
 
-const PORT = process.env.PORT;
+const PORT = process.env.PORT || 3000 ;
 httpServer.listen(PORT);
 console.log(`Listening on port ${PORT}...`);
 sockets(io);
